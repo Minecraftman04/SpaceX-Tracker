@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#05070c">
+  <meta name="description" content="Track upcoming and previous SpaceX launches with live data from Launch Library 2.">
+  <title>SpaceX Launch Tracker</title>
+  <link rel="preconnect" href="https://ll.thespacedevs.com">
+  <link rel="preconnect" href="https://thespacedevs-prod.nyc3.digitaloceanspaces.com">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#launches">Skip to launches</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="#top" aria-label="SpaceX Launch Tracker home">
+        <span class="brand-mark" aria-hidden="true">↗</span>
+        <span>SpaceX <strong>Launch Tracker</strong></span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#next-launch">Next launch</a>
+        <a href="#launches">All launches</a>
+        <a href="#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" id="next-launch" aria-labelledby="hero-title">
+      <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-two" aria-hidden="true"></div>
+      <div class="shell hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="pulse-dot"></span> Live launch data</p>
+          <h1 id="hero-title">The next SpaceX mission, at a glance.</h1>
+          <p class="hero-intro">Upcoming launch windows, mission details, rockets, pads, live streams and a searchable launch history.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#launches">Explore launches</a>
+            <button class="button button-ghost" id="refresh-button" type="button">
+              <span aria-hidden="true">↻</span> Refresh data
+            </button>
+          </div>
+          <p class="data-status" id="data-status" role="status" aria-live="polite">Connecting to Launch Library 2…</p>
+        </div>
+
+        <article class="featured-card loading-card" id="featured-launch" aria-live="polite">
+          <div class="featured-image skeleton"></div>
+          <div class="featured-overlay"></div>
+          <div class="featured-content">
+            <div class="skeleton skeleton-line short"></div>
+            <div class="skeleton skeleton-line title"></div>
+            <div class="countdown skeleton countdown-skeleton" aria-hidden="true"></div>
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line medium"></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="launch-section" id="launches" aria-labelledby="launches-title">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Mission manifest</p>
+            <h2 id="launches-title">SpaceX launches</h2>
+          </div>
+          <p>Browse the next scheduled missions or look back through recent launches.</p>
+        </div>
+
+        <div class="toolbar">
+          <div class="tabs" role="tablist" aria-label="Launch list">
+            <button class="tab active" id="upcoming-tab" role="tab" aria-selected="true" aria-controls="launch-grid" data-view="upcoming" type="button">
+              Upcoming <span class="tab-count" id="upcoming-count">–</span>
+            </button>
+            <button class="tab" id="previous-tab" role="tab" aria-selected="false" aria-controls="launch-grid" data-view="previous" type="button">
+              Previous <span class="tab-count" id="previous-count">–</span>
+            </button>
+          </div>
+
+          <div class="controls">
+            <label class="search-field">
+              <span class="sr-only">Search launches</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>
+              <input id="search-input" type="search" placeholder="Search missions, rockets or locations" autocomplete="off">
+            </label>
+            <label class="select-field">
+              <span class="sr-only">Filter by rocket</span>
+              <select id="rocket-filter">
+                <option value="all">All rockets</option>
+              </select>
+            </label>
+            <label class="select-field">
+              <span class="sr-only">Sort launches</span>
+              <select id="sort-select">
+                <option value="date">Launch date</option>
+                <option value="name">Mission name</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="notice error-notice" id="error-notice" hidden>
+          <div>
+            <strong>Launch data could not be loaded.</strong>
+            <p id="error-message">Please try again in a moment.</p>
+          </div>
+          <button class="button button-small" id="retry-button" type="button">Try again</button>
+        </div>
+
+        <div class="launch-grid" id="launch-grid" role="tabpanel" aria-labelledby="upcoming-tab" aria-busy="true">
+          <article class="launch-card skeleton-card" aria-hidden="true"></article>
+          <article class="launch-card skeleton-card" aria-hidden="true"></article>
+          <article class="launch-card skeleton-card" aria-hidden="true"></article>
+          <article class="launch-card skeleton-card" aria-hidden="true"></article>
+          <article class="launch-card skeleton-card" aria-hidden="true"></article>
+          <article class="launch-card skeleton-card" aria-hidden="true"></article>
+        </div>
+
+        <div class="empty-state" id="empty-state" hidden>
+          <span aria-hidden="true">⌕</span>
+          <h3>No launches found</h3>
+          <p>Try changing your search or rocket filter.</p>
+        </div>
+
+        <div class="load-more-wrap">
+          <button class="button button-ghost" id="load-more-button" type="button" hidden>Load more launches</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section" id="about" aria-labelledby="about-title">
+      <div class="shell about-grid">
+        <div>
+          <p class="eyebrow">About the data</p>
+          <h2 id="about-title">Free, current and built for the open web.</h2>
+        </div>
+        <div class="about-copy">
+          <p>This tracker reads public launch information from The Space Devs' Launch Library 2 API. The site stores a short-lived copy in your browser to reduce API requests and improve loading speed.</p>
+          <p>Launch dates can change at short notice. Always check the linked official webcast or mission source before making travel plans.</p>
+          <a class="text-link" href="https://thespacedevs.com/llapi" target="_blank" rel="noopener noreferrer">View the API provider <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <p>SpaceX Launch Tracker</p>
+      <p>Not affiliated with SpaceX. Data provided by <a href="https://thespacedevs.com/llapi" target="_blank" rel="noopener noreferrer">The Space Devs</a>.</p>
+    </div>
+  </footer>
+
+  <dialog class="launch-dialog" id="launch-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-shell">
+      <button class="dialog-close" id="dialog-close" type="button" aria-label="Close launch details">×</button>
+      <div id="dialog-content"></div>
+    </div>
+  </dialog>
+
+  <template id="card-template">
+    <article class="launch-card">
+      <button class="card-button" type="button">
+        <div class="card-image-wrap">
+          <img class="card-image" alt="" loading="lazy">
+          <div class="card-image-fallback" aria-hidden="true"><span>↗</span></div>
+          <span class="status-badge"></span>
+        </div>
+        <div class="card-body">
+          <p class="card-date"></p>
+          <h3 class="card-title"></h3>
+          <dl class="card-facts">
+            <div><dt>Rocket</dt><dd class="card-rocket"></dd></div>
+            <div><dt>Launch site</dt><dd class="card-location"></dd></div>
+          </dl>
+          <div class="card-footer">
+            <span class="card-orbit"></span>
+            <span class="details-link">View details <span aria-hidden="true">→</span></span>
+          </div>
+        </div>
+      </button>
+    </article>
+  </template>
+</body>
+</html>
