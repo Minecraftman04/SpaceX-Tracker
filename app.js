@@ -322,7 +322,8 @@ function createLaunchCard(launch) {
   }
 
   badge.textContent = statusName(launch);
-  badge.classList.add(statusClass(launch));
+  const badgeClass = statusClass(launch);
+  if (badgeClass) badge.classList.add(badgeClass);
   fragment.querySelector('.card-date').textContent = formatDateTime(parseDate(launch.net));
   fragment.querySelector('.card-title').textContent = launch.name || 'Unnamed mission';
   fragment.querySelector('.card-rocket').textContent = rocketName(launch);
